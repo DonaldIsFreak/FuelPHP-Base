@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>{{ title }}</title>
+	{{ asset_css('bootstrap.css') }}
+    {{ asset_css('main.css') }}
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Wrap all page content here -->
+    <div id="wrap">
+      
+      <!-- Fixed navbar -->
+      <div class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url('/') }}">FuelPHP-Base</a>
+          </div>
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="{{ url('/') }}">Home</a></li>
+              <li><a href="{{ url('about') }}">About</a></li>
+              <li><a href="{{ url('contact') }}">Contact</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+      
+      <!-- Begin page content -->
+      <div class="container">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+
+    <div id="footer">
+      <div class="container">
+        <p class="text-muted pull-right">Page rendered in {exec_time}s using {mem_usage}mb of memory.</p>
+      </div>
+    </div>
+</body>
+</html>
+

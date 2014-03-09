@@ -1,4 +1,4 @@
-FuelPHP-Base
-============
+# FuelPHP-Base
 
-Customize FuelPHP framework.
+Customize FuelPHP 1.7 framework.
+

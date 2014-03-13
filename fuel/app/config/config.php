@@ -78,7 +78,7 @@ return array(
 	/**
 	 * Localization & internationalization settings
 	 */
-	// 'language'           => 'en', // Default language
+	'language'           => 'en', // Default language
 	// 'language_fallback'  => 'en', // Fallback language when file isn't available for default language
 	// 'locale'             => 'en_US', // PHP set_locale() setting, null to not set
 
@@ -237,9 +237,9 @@ return array(
 	 *
 	 * Paths MUST end with a directory separator (the DS constant)!
 	 */
-	// 'module_paths' => array(
-	// 	//APPPATH.'modules'.DS
-	// ),
+	'module_paths' => array(
+		APPPATH.'modules'.DS
+	),
 
 	/**
 	 * To enable you to split up your additions to the framework, packages are
@@ -271,6 +271,8 @@ return array(
 		 * );
 		 */
 		'packages'  => array(
+            'orm',
+            'auth',
 			'parser',
 		),
 
@@ -282,7 +284,7 @@ return array(
 		 *
 		 * A path must be set in module_paths for this to work.
 		 */
-		// 'modules'  => array(),
+		'modules'  => array(),
 
 		/**
 		 * Classes to autoload & initialize even when not used
@@ -307,7 +309,7 @@ return array(
 		 * add it like 'validation' => 'forms'.
 		 * If you don't want the lang in a group use null as groupname.
 		 */
-		// 'language'  => array(),
+		'language'  => array('login'),
 	),
 
 );

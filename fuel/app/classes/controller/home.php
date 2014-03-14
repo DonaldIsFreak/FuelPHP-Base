@@ -54,104 +54,69 @@ class Controller_Home extends Controller
     }
     
     public function action_register()
-{
-
-    $view = View::forge('home/register.twig');
-    
-    // create the registration fieldset
-    $form = Fieldset::forge('registerform');
-
-    // add a csrf token to prevent CSRF attacks
-    $form->form()->add_csrf();
-
-    // and populate the form with the model properties
-    $form->add_model('Model\\Auth_User');
-
-    // add the fullname field, it's a profile property, not a user property
-    $form->add_after('fullname', __('login.form.fullname'), array(), array(), 'username')->add_rule('required');
-
-    // add a password confirmation field
-    $form->add_after('confirm', __('login.form.confirm'), array('type' => 'password'), array(), 'password')->add_rule('required');
-
-    // make sure the password is required
-    $form->field('password')->add_rule('required');
-
-    // and new users are not allowed to select the group they're in (duh!)
-    $form->disable('group_id');
-
-    // since it's not on the form, make sure validation doesn't trip on its absence
-    $form->field('group_id')->delete_rule('required')->delete_rule('is_numeric');
-
-    // was the registration form posted?
-    if (Input::method() == 'POST')
     {
-        // validate the input
-        $form->validation()->run();
+        $view = View::forge('home/register.twig');
+        $view->messages = array();
+        
+        $form = Fieldset::forge('registerform');
 
-        // if validated, create the user
-        if ( ! $form->validation()->error())
+        $form->form()->add_csrf();
+        $form->add_model('Model\\Auth_User');
+        $form->add_after('fullname', __('login.form.fullname'), array(), array(), 'username')->add_rule('required');
+        $form->add_after('confirm', __('login.form.confirm'), array('type' => 'password'), array(), 'password')->add_rule('required');
+        $form->field('password')->add_rule('required');
+        $form->disable('group_id');
+        $form->field('group_id')->delete_rule('required')->delete_rule('is_numeric');
+
+        if (Input::method() == 'POST')
         {
-            try
+            $form->validation()->run();
+
+            if ( ! $form->validation()->error())
             {
-                // call Auth to create this user
-                $created = \Auth::create_user(
-                    $form->validated('username'),
-                    $form->validated('password'),
-                    $form->validated('email'),
-                    \Config::get('application.user.default_group', 1),
-                    array(
-                        'fullname' => $form->validated('fullname'),
-                    )
-                );
-
-                // if a user was created succesfully
-                if ($created)
+                try
                 {
-                    // inform the user
-                    
-
-                    // and go back to the previous page, or show the
-                    // application dashboard if we don't have any
-                  
+                    $created = Auth::create_user(
+                        $form->validated('username'),
+                        $form->validated('password'),
+                        $form->validated('email'),
+                        Config::get('application.user.default_group', 1),
+                        array(
+                            'fullname' => $form->validated('fullname'),
+                        )
+                    );
+                
+                    if ($created)
+                    {
+                        Response::redirect('home');
+                    }
+                    else
+                    {
+                        $view->messages[]=__('login.account-creation-failed');
+                    }
                 }
-                else
-                {
-                    // oops, creating a new user failed?
-                    $form->vali->set_message(__('login.account-creation-failed'));
+                catch (SimpleUserUpdateException $e)
+                {      
+                    if ($e->getCode() == 2)
+                    {
+                        $view->messages[] = __('login.email-already-exists');
+                    }
+                    elseif ($e->getCode() == 3)
+                    {
+                        $view->messages[]= __('login.username-already-exists');
+                    }
+                    else
+                    {
+                        $view->messages[]=$e->getMessage();
+                    }
                 }
+            }else{
+                $view->messages = $form->validation()->error_message();
             }
-
-            // catch exceptions from the create_user() call
-            catch (\SimpleUserUpdateException $e)
-            {
-                // duplicate email address
-                if ($e->getCode() == 2)
-                {
-                    \Messages::error(__('login.email-already-exists'));
-                }
-
-                // duplicate username
-                elseif ($e->getCode() == 3)
-                {
-                    \Messages::error(__('login.username-already-exists'));
-                }
-
-                // this can't happen, but you'll never know...
-                else
-                {
-                    \Messages::error($e->getMessage());
-                }
-            }
-        }else{
-            $view->messages = $form->validation()->error();
+            $form->repopulate();
         }
-
-        // validation failed, repopulate the form from the posted data
-        $form->repopulate();
+        $form->add('submit','',array('type'=>'submit','value'=>'Submit'));
+        return $view->set('form', $form, false);
     }
-    $form->add('submit','',array('type'=>'submit','value'=>'Submit'));
-    // pass the fieldset to the form, and display the new user registration view
-    return $view->set('form', $form, false);
-}
 
 }

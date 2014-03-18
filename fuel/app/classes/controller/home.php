@@ -1,63 +1,103 @@
 <?php
 /**
- * Fuel is a fast, lightweight, community driven PHP5 framework.
  *
- * @package    Fuel
- * @version    1.7
- * @author     Fuel Development Team
- * @license    MIT License
- * @copyright  2010 - 2013 Fuel Development Team
- * @link       http://fuelphp.com
+ *
+ * @extends  Controller_Base
+ * @author Donald Zhan <donald.zhan1984@gmail.com>
+ * @package  app
  */
 
-/**
- * The Welcome Controller.
- *
- * A basic controller example.  Has examples of how to set the
- * response body and status.
- *
- * @package  app
- * @extends  Controller
- */
-class Controller_Home extends Controller
+
+class Controller_Home extends Controller_Base
 {
 
+    /**
+     *
+     *
+     * @return unknown
+     */
     public function action_index()
     {
-        $view = View::forge('home/index.twig');
-        $view->title = 'Index';
-        return Response::forge($view);
+        $this->view->test = $this->viewFolder;
+        return Response::forge($this->view);
     }
-    
+
+
+
+    /**
+     *
+     *
+     * @return unknown
+     */
     public function action_contact()
     {
-        $view = View::forge('home/contact.twig');
+        $view = $this->view;
         $view->title = 'Contact';
         return Response::forge($view);
     }
-    
+
+
+
+    /**
+     *
+     *
+     * @return unknown
+     */
     public function action_about()
     {
-        $view = View::forge('home/about.twig');
+        $view = $this->view;
         $view->title = 'About';
         return Response::forge($view);
     }
+
+    /**
+     *
+     *
+     * @return unknown
+     */
     public function action_hello()
     {
-        $view = ViewModel::forge('home/hello.twig');
+        $view = $this->view;
         $view->title = 'Hello';
         return Response::forge($view);
     }
+
+    /**
+     *
+     *
+     * @return unknown
+     */
     public function action_404()
     {
         return Response::forge(ViewModel::forge('home/404'), 404);
     }
-    
+
+    /**
+     *
+     */
+    public function action_login()
+    {
+
+    }
+
+    /**
+     *
+     */
+    public function action_logout()
+    {
+
+    }
+
+    /**
+     *
+     *
+     * @return unknown
+     */
     public function action_register()
     {
-        $view = View::forge('home/register.twig');
+        $view = $this->view;
         $view->messages = array();
-        
+
         $form = Fieldset::forge('registerform');
 
         $form->form()->add_csrf();
@@ -68,12 +108,10 @@ class Controller_Home extends Controller
         $form->disable('group_id');
         $form->field('group_id')->delete_rule('required')->delete_rule('is_numeric');
 
-        if (Input::method() == 'POST')
-        {
+        if (Input::method() == 'POST') {
             $form->validation()->run();
 
-            if ( ! $form->validation()->error())
-            {
+            if ( ! $form->validation()->error()) {
                 try
                 {
                     $created = Auth::create_user(
@@ -85,37 +123,31 @@ class Controller_Home extends Controller
                             'fullname' => $form->validated('fullname'),
                         )
                     );
-                
-                    if ($created)
-                    {
+
+                    if ($created) {
                         Response::redirect('home');
                     }
-                    else
-                    {
+                    else {
                         $view->messages[]=__('login.account-creation-failed');
                     }
                 }
-                catch (SimpleUserUpdateException $e)
-                {      
-                    if ($e->getCode() == 2)
-                    {
+                catch (SimpleUserUpdateException $e) {
+                    if ($e->getCode() == 2) {
                         $view->messages[] = __('login.email-already-exists');
                     }
-                    elseif ($e->getCode() == 3)
-                    {
+                    elseif ($e->getCode() == 3) {
                         $view->messages[]= __('login.username-already-exists');
                     }
-                    else
-                    {
+                    else {
                         $view->messages[]=$e->getMessage();
                     }
                 }
-            }else{
+            }else {
                 $view->messages = $form->validation()->error_message();
             }
             $form->repopulate();
         }
-        $form->add('submit','',array('type'=>'submit','value'=>'Submit'));
+        $form->add('submit', '', array('type'=>'submit', 'value'=>'Submit'));
         return $view->set('form', $form, false);
     }
 

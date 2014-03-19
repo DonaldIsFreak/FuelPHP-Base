@@ -65,6 +65,7 @@ class Controller_Home extends Controller_Base
         return Response::forge(ViewModel::forge('home/404'), 404);
     }
 
+
     /**
      *
      */

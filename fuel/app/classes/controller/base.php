@@ -11,7 +11,9 @@
 class Controller_Base extends Controller
 {
     public $view = null;
+    public $viewTitle = null;
     public $viewFolder = null;
+    public $view_messages = array();
 
     /**
      *
@@ -44,21 +46,44 @@ class Controller_Base extends Controller
         $this->viewFolder = $folder;
     }
 
+
     /**
      *
      */
     public function setDefaultViewFolder()
     {
-        $currentCtrlName = substr(strtolower($this->request->controller), 11) ;
+        $currentCtrlName = $this->getCtrlName();
         $patternStr = '_';
         $replaceStr = DIRECTORY_SEPARATOR;
         $this->viewFolder = str_replace($patternStr, $replaceStr, $currentCtrlName) ;
     }
 
     /**
+     * Default the view title is action name.
+     */
+    public function setDefaultViewTitle()
+    {
+        $this->viewTitle = $this->request->action;
+    }
+
+    /**
      *
      *
      * @return unknown
+     */
+    public function getDefaultViewTitle()
+    {
+        if (is_null($this->viewTitle)) {
+            $this->setDefaultViewTitle();
+        }
+        return $this->viewTitle;
+
+    }
+
+    /**
+     *
+     *
+     * @return string
      */
     public function getViewFilePath()
     {
@@ -68,11 +93,48 @@ class Controller_Base extends Controller
 
     /**
      *
+     *
+     * @param boolean $withoutCtrlWord (optional)
+     * @return string
+     */
+    public function getCtrlName($withoutCtrlWord=TRUE)
+    {
+        $ctrlName = strtolower($this->request->controller);
+
+        if ($withoutCtrlWord) {
+            // 'Controller_' length is 11
+            $ctrlName= substr($ctrlName, 11);
+        }
+
+        return $ctrlName;
+    }
+
+
+    /**
+     *
      */
     public function before()
     {
         if (is_null($this->view)) {
             $this->view = View::forge($this->getViewFilePath());
         }
+    }
+
+    /**
+     *
+     *
+     * @param object  $response
+     * @return unknown
+     */
+    public function after($response)
+    {
+        if (!isset($this->view->title)) {
+            $this->view->title = $this->getDefaultViewTitle();
+        }
+        $this->view->messages = $this->view_messages;
+        if ( ! $response instanceof Response) {
+            $response = \Response::forge($this->view, $this->response_status);
+        }
+        return parent::after($response);
     }
 }

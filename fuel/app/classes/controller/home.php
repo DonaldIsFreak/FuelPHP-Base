@@ -18,8 +18,7 @@ class Controller_Home extends Controller_Base
      */
     public function action_index()
     {
-        $this->view->test = $this->viewFolder;
-        return Response::forge($this->view);
+
     }
 
 
@@ -31,9 +30,7 @@ class Controller_Home extends Controller_Base
      */
     public function action_contact()
     {
-        $view = $this->view;
-        $view->title = 'Contact';
-        return Response::forge($view);
+
     }
 
 
@@ -45,9 +42,7 @@ class Controller_Home extends Controller_Base
      */
     public function action_about()
     {
-        $view = $this->view;
-        $view->title = 'About';
-        return Response::forge($view);
+
     }
 
     /**
@@ -57,9 +52,7 @@ class Controller_Home extends Controller_Base
      */
     public function action_hello()
     {
-        $view = $this->view;
-        $view->title = 'Hello';
-        return Response::forge($view);
+
     }
 
     /**
@@ -77,6 +70,7 @@ class Controller_Home extends Controller_Base
      */
     public function action_login()
     {
+
 
     }
 
@@ -96,7 +90,6 @@ class Controller_Home extends Controller_Base
     public function action_register()
     {
         $view = $this->view;
-        $view->messages = array();
 
         $form = Fieldset::forge('registerform');
 
@@ -107,6 +100,7 @@ class Controller_Home extends Controller_Base
         $form->field('password')->add_rule('required');
         $form->disable('group_id');
         $form->field('group_id')->delete_rule('required')->delete_rule('is_numeric');
+        $form->add('submit', '', array('type'=>'submit', 'value'=>'Submit'));
 
         if (Input::method() == 'POST') {
             $form->validation()->run();
@@ -132,14 +126,16 @@ class Controller_Home extends Controller_Base
                     }
                 }
                 catch (SimpleUserUpdateException $e) {
-                    if ($e->getCode() == 2) {
+                    switch ($e->getCode()) {
+                    case 2:
                         $view->messages[] = __('login.email-already-exists');
-                    }
-                    elseif ($e->getCode() == 3) {
+                        break;
+                    case 3:
                         $view->messages[]= __('login.username-already-exists');
-                    }
-                    else {
+                        break;
+                    default:
                         $view->messages[]=$e->getMessage();
+
                     }
                 }
             }else {
@@ -147,7 +143,6 @@ class Controller_Home extends Controller_Base
             }
             $form->repopulate();
         }
-        $form->add('submit', '', array('type'=>'submit', 'value'=>'Submit'));
         return $view->set('form', $form, false);
     }
 

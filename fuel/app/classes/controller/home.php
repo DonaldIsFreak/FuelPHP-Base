@@ -68,10 +68,29 @@ class Controller_Home extends Controller_Base
 
     /**
      *
+     *
+     * @return unknown
      */
     public function action_login()
     {
+        $view = $this->view;
 
+        if (Auth::check()) {
+            $this->view_messages[] = 'login aleady logged in';
+        }
+
+        if (Input::method() == 'POST') {
+
+            if (Auth::login(Input::param('username'), Input::param('password'))) {
+                if (Input::param('remember', false)) {
+                    Auth::remember_me();
+                }else {
+                    Auth::dont_remember_me();
+                }
+            }else {
+                $this->view_messages[] = 'login failure';
+            }
+        }
 
     }
 
@@ -80,7 +99,9 @@ class Controller_Home extends Controller_Base
      */
     public function action_logout()
     {
-
+        Auth::dont_remember_me();
+        Auth::logout();
+        Response::redirect_back();
     }
 
     /**
@@ -123,24 +144,24 @@ class Controller_Home extends Controller_Base
                         Response::redirect('home');
                     }
                     else {
-                        $view->messages[]=__('login.account-creation-failed');
+                        $this->view_messages[]=__('login.account-creation-failed');
                     }
                 }
                 catch (SimpleUserUpdateException $e) {
                     switch ($e->getCode()) {
                     case 2:
-                        $view->messages[] = __('login.email-already-exists');
+                        $this->view_messages[] = __('login.email-already-exists');
                         break;
                     case 3:
-                        $view->messages[]= __('login.username-already-exists');
+                        $this->view_messages[]= __('login.username-already-exists');
                         break;
                     default:
-                        $view->messages[]=$e->getMessage();
+                        $this->view_messages[]=$e->getMessage();
 
                     }
                 }
             }else {
-                $view->messages = $form->validation()->error_message();
+                $this->view_messages = $form->validation()->error_message();
             }
             $form->repopulate();
         }

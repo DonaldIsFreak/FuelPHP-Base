@@ -1,13 +1,24 @@
 {% extends "layout.twig" %}
 
+{% block header %}
+<style>
+.form-signin{
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Login</h1>
 {% for msg in messages %}
     <div class="alert alert-warning">{{ msg }}</div>
 {% endfor %}
-<form method="post" action="login">
-    User Name:<input type="text" name="username"/><br/>
-    Password:<input type="password" name="password"/><br/>
-    <button type="submit">Submit</button>
+<form class="form-signin" method="post" action="login">
+    <h2>Please login</h2>
+    <input class="form-control" type="text" name="username" placeholder="User Name"/><br/>
+    <input class="form-control" type="password" name="password" placeholder="Password"/><br/>
+    <label class="checkbox"><input type="checkbox" name="remember" value="false"/>Remember me</label>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
 </form>
 {% endblock %}

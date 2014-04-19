@@ -117,12 +117,14 @@ class Controller_Home extends Controller_Base
 
         $form->form()->add_csrf();
         $form->add_model('Model\\Auth_User');
-        $form->add_after('fullname', __('login.form.fullname'), array(), array(), 'username')->add_rule('required');
-        $form->add_after('confirm', __('login.form.confirm'), array('type' => 'password'), array(), 'password')->add_rule('required');
-        $form->field('password')->add_rule('required');
+        $form->field('username')->set_attribute(array('type'=> 'text' ,'class'=> 'form-control'));
+        $form->field('password')->add_rule('required')->set_attribute(array('type' => 'password','class'=> 'form-control'));
+        $form->field('email')->set_attribute(array('type' => 'text','class'=> 'form-control'));
+        $form->add_after('fullname', __('login.form.fullname'), array('type'=>'text','class' => 'form-control'), array(), 'username')->add_rule('required');
+        $form->add_after('confirm', __('login.form.confirm'), array('type' => 'password','class'=> 'form-control'), array(), 'password')->add_rule('required');
         $form->disable('group_id');
         $form->field('group_id')->delete_rule('required')->delete_rule('is_numeric');
-        $form->add('submit', '', array('type'=>'submit', 'value'=>'Submit'));
+        $form->add('submit', '', array('type'=>'submit', 'value'=>'Submit','class'=>"btn btn-lg btn-primary btn-block"));
 
         if (Input::method() == 'POST') {
             $form->validation()->run();
